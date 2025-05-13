@@ -1,15 +1,62 @@
 import 'package:flutter/material.dart';
 
-/// A utility class that provides responsive sizing helpers
-/// This helps ensure UI elements adapt properly to different screen sizes
-class ResponsiveHelper {
-  // Private constructor to prevent instantiation
-  ResponsiveHelper._();
+enum DeviceType {
+  mobile,
+  tablet,
+  desktop,
+}
 
-  /// Device type breakpoints
-  static const double _mobileBreakpoint = 600;
-  static const double _tabletBreakpoint = 900;
-  static const double _desktopBreakpoint = 1200;
+class ResponsiveHelper {
+  // Breakpoints
+  static const double mobileBreakpoint = 600;
+  static const double tabletBreakpoint = 900;
+
+  // Get device type based on width
+  static DeviceType getDeviceType(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+
+    if (width < mobileBreakpoint) {
+      return DeviceType.mobile;
+    } else if (width < tabletBreakpoint) {
+      return DeviceType.tablet;
+    } else {
+      return DeviceType.desktop;
+    }
+  }
+
+  // Check if device is mobile
+  static bool isMobile(BuildContext context) {
+    return getDeviceType(context) == DeviceType.mobile;
+  }
+
+  // Check if device is tablet
+  static bool isTablet(BuildContext context) {
+    return getDeviceType(context) == DeviceType.tablet;
+  }
+
+  // Check if device is desktop
+  static bool isDesktop(BuildContext context) {
+    return getDeviceType(context) == DeviceType.desktop;
+  }
+
+  // Get responsive value based on device type
+  static T responsiveValue<T>({
+    required BuildContext context,
+    required T mobile,
+    T? tablet,
+    T? desktop,
+  }) {
+    final deviceType = getDeviceType(context);
+
+    switch (deviceType) {
+      case DeviceType.mobile:
+        return mobile;
+      case DeviceType.tablet:
+        return tablet ?? mobile;
+      case DeviceType.desktop:
+        return desktop ?? tablet ?? mobile;
+    }
+  }
 
   /// Returns the current screen width
   static double screenWidth(BuildContext context) {
@@ -19,36 +66,6 @@ class ResponsiveHelper {
   /// Returns the current screen height
   static double screenHeight(BuildContext context) {
     return MediaQuery.of(context).size.height;
-  }
-
-  /// Returns true if the screen width is less than the mobile breakpoint
-  static bool isMobile(BuildContext context) {
-    return screenWidth(context) < _mobileBreakpoint;
-  }
-
-  /// Returns true if the screen width is between mobile and tablet breakpoints
-  static bool isTablet(BuildContext context) {
-    return screenWidth(context) >= _mobileBreakpoint &&
-        screenWidth(context) < _tabletBreakpoint;
-  }
-
-  /// Returns true if the screen width is between tablet and desktop breakpoints
-  static bool isDesktop(BuildContext context) {
-    return screenWidth(context) >= _tabletBreakpoint &&
-        screenWidth(context) < _desktopBreakpoint;
-  }
-
-  /// Returns true if the screen width is greater than the desktop breakpoint
-  static bool isLargeDesktop(BuildContext context) {
-    return screenWidth(context) >= _desktopBreakpoint;
-  }
-
-  /// Returns the device type as a string
-  static String deviceType(BuildContext context) {
-    if (isMobile(context)) return 'mobile';
-    if (isTablet(context)) return 'tablet';
-    if (isDesktop(context)) return 'desktop';
-    return 'large_desktop';
   }
 
   /// Returns a responsive value based on the screen width
@@ -195,9 +212,9 @@ class ResponsiveHelper {
   }
 }
 
-/// A widget that builds different layouts based on the screen size
+// Responsive builder widget
 class ResponsiveBuilder extends StatelessWidget {
-  final Widget Function(BuildContext context, String deviceType) builder;
+  final Widget Function(BuildContext context, DeviceType deviceType) builder;
 
   const ResponsiveBuilder({
     Key? key,
@@ -206,46 +223,36 @@ class ResponsiveBuilder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        return builder(context, ResponsiveHelper.deviceType(context));
-      },
-    );
+    final deviceType = ResponsiveHelper.getDeviceType(context);
+    return builder(context, deviceType);
   }
 }
 
-/// A widget that builds different layouts for mobile, tablet, and desktop
+// Responsive layout widget
 class ResponsiveLayout extends StatelessWidget {
   final Widget mobile;
   final Widget? tablet;
   final Widget? desktop;
-  final Widget? largeDesktop;
 
   const ResponsiveLayout({
     Key? key,
     required this.mobile,
     this.tablet,
     this.desktop,
-    this.largeDesktop,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        if (ResponsiveHelper.isMobile(context)) {
-          return mobile;
+    return ResponsiveBuilder(
+      builder: (context, deviceType) {
+        switch (deviceType) {
+          case DeviceType.mobile:
+            return mobile;
+          case DeviceType.tablet:
+            return tablet ?? mobile;
+          case DeviceType.desktop:
+            return desktop ?? tablet ?? mobile;
         }
-
-        if (ResponsiveHelper.isTablet(context)) {
-          return tablet ?? mobile;
-        }
-
-        if (ResponsiveHelper.isDesktop(context)) {
-          return desktop ?? tablet ?? mobile;
-        }
-
-        return largeDesktop ?? desktop ?? tablet ?? mobile;
       },
     );
   }

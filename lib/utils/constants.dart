@@ -84,6 +84,11 @@ class AppColors {
   // Streak color
   static const Color streakColor = Color(0xFFFF6B00);
 
+  // Onboarding colors
+  static const Color onboardingBackground = Color(0xFF1A3A8F);
+  static const Color onboardingButtonLight = Color(0xFF4169E1);
+  static const Color onboardingButtonDark = Color(0xFF3A5BC7);
+
   // Dark theme colors
   static const Color darkBackground = Color(0xFF121212);
   static const Color darkSurface = Color(0xFF1E1E1E);
