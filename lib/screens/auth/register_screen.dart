@@ -43,13 +43,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
           return SafeArea(
             child: SingleChildScrollView(
               child: Padding(
-                padding: EdgeInsets.only(left: 24.r,right: 24.r),
+                padding: EdgeInsets.all(24.r),
                 child: Form(
                   key: _formKey,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-
+                      SizedBox(height: 40.h),
 
                       // App logo
                       Center(
@@ -60,7 +60,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                       ),
 
-                      SizedBox(height: 10.h),
+                      SizedBox(height: 40.h),
 
                       // Title
                       Text(
@@ -83,7 +83,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                       ),
 
-                      SizedBox(height: 30.h),
+                      SizedBox(height: 40.h),
 
                       // Full Name label
                       Text(
@@ -123,7 +123,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         },
                       ),
 
-                      SizedBox(height: 10.h),
+                      SizedBox(height: 20.h),
 
                       // Email label
                       Text(
@@ -167,7 +167,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         },
                       ),
 
-                      SizedBox(height: 10.h),
+                      SizedBox(height: 20.h),
 
                       // Password label
                       Text(
@@ -222,7 +222,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         },
                       ),
 
-                      SizedBox(height: 10.h),
+                      SizedBox(height: 24.h),
 
                       // Exam selection label
                       Text(
@@ -309,7 +309,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ],
                       ),
 
-                      SizedBox(height: 10.h),
+                      SizedBox(height: 24.h),
 
                       // Terms and conditions checkbox
                       Row(
@@ -352,7 +352,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ],
                       ),
 
-                      SizedBox(height: 20.h),
+                      SizedBox(height: 32.h),
 
                       // Register button
                       SizedBox(
@@ -391,7 +391,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                       ),
 
-                      SizedBox(height: 10.h),
+                      SizedBox(height: 24.h),
 
                       // Error message
                       if (authProvider.errorMessage != null)
@@ -421,7 +421,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           ),
                         ),
 
-
+                      SizedBox(height: 16.h),
 
                       // Login link
                       Row(
@@ -482,7 +482,65 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
 
     if (success && mounted) {
-      Navigator.of(context).pushReplacementNamed('/home');
+      // Show success message with fixed layout
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            children: [
+              Icon(Icons.check_circle, color: Colors.white),
+              SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  'Registration successful! Please login.',
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 2),
+        ),
+      );
+
+      // Wait for the snackbar to be visible before navigating
+      Future.delayed(Duration(seconds: 2), () {
+        if (mounted) {
+          // Navigate to login page
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (_) => const LoginScreen()),
+          );
+        }
+      });
+    } else if (authProvider.errorMessage != null &&
+        authProvider.errorMessage!.contains('already registered')) {
+      // If email already exists, show a helpful message and navigation option
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            children: [
+              Icon(Icons.info, color: Colors.white),
+              SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  'This email is already registered. Please login instead.',
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+          backgroundColor: Colors.blue,
+          duration: Duration(seconds: 3),
+          action: SnackBarAction(
+            label: 'Login',
+            textColor: Colors.white,
+            onPressed: () {
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(builder: (_) => const LoginScreen()),
+              );
+            },
+          ),
+        ),
+      );
     }
   }
 }

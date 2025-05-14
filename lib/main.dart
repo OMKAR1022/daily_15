@@ -33,7 +33,25 @@ class MyApp extends StatelessWidget {
               theme: AppTheme.lightTheme,
               darkTheme: AppTheme.darkTheme,
               themeMode: ThemeMode.system,
-              home: _getInitialScreen(authProvider),
+
+              // Define named routes
+              routes: {
+                '/': (context) => _getInitialScreen(authProvider),
+                '/home': (context) => const HomeScreen(),
+                '/login': (context) => const LoginScreen(),
+                '/onboarding': (context) => const OnboardingScreen(),
+              },
+
+              // Initial route
+              initialRoute: '/',
+
+              // Handle unknown routes
+              onUnknownRoute: (settings) {
+                return MaterialPageRoute(
+                  builder: (context) => const HomeScreen(),
+                );
+              },
+
               builder: (context, child) {
                 // Initialize SizeConfig here to ensure it's available throughout the app
                 SizeConfig.init(context);

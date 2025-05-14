@@ -1,10 +1,10 @@
 import 'package:daily_fifteen/screens/auth/register_screen.dart';
-import 'package:daily_fifteen/utils/size_config.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../providers/auth_provider.dart';
 import '../../utils/constants.dart';
+import '../../utils/size_config.dart';
 
 
 class LoginScreen extends StatefulWidget {
@@ -55,22 +55,30 @@ class _LoginScreenState extends State<LoginScreen> {
     SizeConfig.init(context);
 
     return Scaffold(
-      backgroundColor:  AppColors.onboardingBackground,
+      backgroundColor: AppColors.primary,
       body: Consumer<AuthProvider>(
         builder: (context, authProvider, _) {
+          // Listen for authentication status changes
+          if (authProvider.status == AuthStatus.authenticated) {
+            // Navigate to home screen if authenticated
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              Navigator.of(context).pushReplacementNamed('/home');
+            });
+          }
+
           final isLoading = authProvider.status == AuthStatus.authenticating;
           final errorMessage = authProvider.errorMessage;
 
           return SafeArea(
             child: SingleChildScrollView(
               child: Padding(
-                padding: EdgeInsets.only(left: 24.r,right: 24.r,top: 10.r),
+                padding: EdgeInsets.all(24.r),
                 child: Form(
                   key: _formKey,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-
+                      SizedBox(height: 40.h),
 
                       // App logo
                       Center(
