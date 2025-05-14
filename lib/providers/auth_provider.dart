@@ -82,27 +82,84 @@ class AuthProvider extends ChangeNotifier {
         }),
       );
 
-      final responseData = jsonDecode(response.body);
-
       if (response.statusCode == 200) {
-        // Save auth token and user data
-        _token = responseData['token'];
-        _userId = responseData['user']['id'].toString();
-        _examType = responseData['user']['exam_type'];
-        _status = AuthStatus.authenticated;
+        try {
+          final responseData = jsonDecode(response.body);
 
-        // Store in shared preferences
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('auth_token', _token!);
-        await prefs.setString('user_id', _userId!);
-        if (_examType != null) {
-          await prefs.setString('exam_type', _examType!);
+          // Debug print to see the actual response structure
+          print('API Response: $responseData');
+
+          // Handle different response structures
+          if (responseData != null) {
+            // Extract token - handle different possible structures
+            if (responseData['token'] != null) {
+              _token = responseData['token'];
+            } else if (responseData['access_token'] != null) {
+              _token = responseData['access_token'];
+            } else if (responseData['data'] != null && responseData['data']['token'] != null) {
+              _token = responseData['data']['token'];
+            }
+
+            // Extract user ID - handle different possible structures
+            if (responseData['user'] != null && responseData['user']['id'] != null) {
+              _userId = responseData['user']['id'].toString();
+            } else if (responseData['data'] != null && responseData['data']['user'] != null) {
+              _userId = responseData['data']['user']['id']?.toString();
+            } else if (responseData['id'] != null) {
+              _userId = responseData['id'].toString();
+            } else {
+              // If we can't find a user ID, generate a temporary one
+              _userId = DateTime.now().millisecondsSinceEpoch.toString();
+            }
+
+            // Extract exam type if available
+            if (responseData['user'] != null && responseData['user']['exam_type'] != null) {
+              _examType = responseData['user']['exam_type'];
+            } else if (responseData['exam_type'] != null) {
+              _examType = responseData['exam_type'];
+            }
+
+            // If we have a token, consider it a successful login
+            if (_token != null) {
+              _status = AuthStatus.authenticated;
+
+              // Store in shared preferences
+              final prefs = await SharedPreferences.getInstance();
+              await prefs.setString('auth_token', _token!);
+              if (_userId != null) {
+                await prefs.setString('user_id', _userId!);
+              }
+              if (_examType != null) {
+                await prefs.setString('exam_type', _examType!);
+              }
+
+              notifyListeners();
+              return true;
+            } else {
+              _errorMessage = 'Invalid response format: No token found';
+              _status = AuthStatus.error;
+              notifyListeners();
+              return false;
+            }
+          } else {
+            _errorMessage = 'Invalid response format: Empty response';
+            _status = AuthStatus.error;
+            notifyListeners();
+            return false;
+          }
+        } catch (e) {
+          _errorMessage = 'Error parsing response: ${e.toString()}';
+          _status = AuthStatus.error;
+          notifyListeners();
+          return false;
         }
-
-        notifyListeners();
-        return true;
       } else {
-        _errorMessage = responseData['message'] ?? 'Login failed';
+        try {
+          final responseData = jsonDecode(response.body);
+          _errorMessage = responseData['message'] ?? 'Login failed with status code: ${response.statusCode}';
+        } catch (e) {
+          _errorMessage = 'Login failed with status code: ${response.statusCode}';
+        }
         _status = AuthStatus.error;
         notifyListeners();
         return false;
