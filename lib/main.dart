@@ -1,6 +1,10 @@
+import 'package:daily_fifteen/providers/activity_provider.dart';
 import 'package:daily_fifteen/providers/auth_provider.dart';
+import 'package:daily_fifteen/providers/challenge_provider.dart';
+import 'package:daily_fifteen/providers/streak_provider.dart';
+import 'package:daily_fifteen/providers/user_provider.dart';
 import 'package:daily_fifteen/screens/auth/login_screen.dart';
-import 'package:daily_fifteen/screens/home_screen.dart';
+import 'package:daily_fifteen/screens/home/home_screen.dart';
 import 'package:daily_fifteen/screens/onboarding/onboarding_screen.dart';
 import 'package:daily_fifteen/utils/constants.dart';
 import 'package:daily_fifteen/utils/size_config.dart';
@@ -23,6 +27,10 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider(create: (_) => UserProvider()),
+        ChangeNotifierProvider(create: (_) => ActivityProvider()),
+        ChangeNotifierProvider(create: (_) => ChallengeProvider()),
+        ChangeNotifierProvider(create: (_) => StreakProvider()),
         // Add other providers here as needed
       ],
       child: Consumer<AuthProvider>(
@@ -33,7 +41,25 @@ class MyApp extends StatelessWidget {
               theme: AppTheme.lightTheme,
               darkTheme: AppTheme.darkTheme,
               themeMode: ThemeMode.system,
-              home: _getInitialScreen(authProvider),
+
+              // Define named routes
+              routes: {
+                '/': (context) => _getInitialScreen(authProvider),
+                '/home': (context) => const HomeScreen(),
+                '/login': (context) => const LoginScreen(),
+                '/onboarding': (context) => const OnboardingScreen(),
+              },
+
+              // Initial route
+              initialRoute: '/',
+
+              // Handle unknown routes
+              onUnknownRoute: (settings) {
+                return MaterialPageRoute(
+                  builder: (context) => const HomeScreen(),
+                );
+              },
+
               builder: (context, child) {
                 // Initialize SizeConfig here to ensure it's available throughout the app
                 SizeConfig.init(context);
