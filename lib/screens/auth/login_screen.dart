@@ -60,9 +60,12 @@ class _LoginScreenState extends State<LoginScreen> {
         builder: (context, authProvider, _) {
           // Listen for authentication status changes
           if (authProvider.status == AuthStatus.authenticated) {
-            // Navigate to home screen if authenticated
+            // Navigate to home screen if authenticated, passing the userId
             WidgetsBinding.instance.addPostFrameCallback((_) {
-              Navigator.of(context).pushReplacementNamed('/home');
+              Navigator.of(context).pushReplacementNamed(
+                '/home',
+                arguments: {'userId': authProvider.userId},
+              );
             });
           }
 

@@ -3,11 +3,24 @@ import 'package:flutter/material.dart';
 /// This class contains all the constant values used throughout the app
 /// Colors, dimensions, text styles, and other design system elements
 class AppConstants {
+  // API
+  static const String apiBaseUrl = 'http://127.0.0.1:8000';
+
+  // App settings
+  static const String appName = 'Daily MCQ';
+  static const String appVersion = '1.0.0';
+
+  // Shared preferences keys
+  static const String tokenKey = 'token';
+  static const String userIdKey = 'userId';
+  static const String onboardingCompletedKey = 'onboardingCompleted';
+
+  // Other constants
+  static const int maxStreakDays = 5;
+  static const int defaultChallengeTimeHours = 12;
+
   // Private constructor to prevent instantiation
   AppConstants._();
-
-  // App name
-  static const String appName = 'Daily JEE/NEET MCQ';
 
   // Animation durations
   static const Duration defaultAnimationDuration = Duration(milliseconds: 300);
@@ -37,45 +50,47 @@ class AppConstants {
   static const double buttonHeightS = 32.0;
   static const double buttonHeightM = 48.0;
   static const double buttonHeightL = 56.0;
+
 }
 
 /// App color palette
 class AppColors {
+  static const Color primary = Color(0xFF1565C0);
+  static const Color secondary = Color(0xFF42A5F5);
+  static const Color accent = Color(0xFF2196F3);
+  static const Color background = Color(0xFFF5F7FA);
+  static const Color textPrimary = Color(0xFF212121);
+  static const Color textSecondary = Color(0xFF757575);
+  static const Color divider = Color(0xFFBDBDBD);
+  static const Color error = Color(0xFFD32F2F);
+  static const Color success = Color(0xFF388E3C);
+  static const Color warning = Color(0xFFFFA000);
+  static const Color info = Color(0xFF0288D1);
   // Private constructor to prevent instantiation
   AppColors._();
 
   // Primary colors
-  static const Color primary = Color(0xFF0A6EBD);
   static const Color primaryLight = Color(0xFF3A8ED0);
   static const Color primaryDark = Color(0xFF004F8B);
 
   // Secondary colors
-  static const Color secondary = Color(0xFF7A4069);
   static const Color secondaryLight = Color(0xFFA86E97);
   static const Color secondaryDark = Color(0xFF4D1A3E);
 
   // Accent colors
-  static const Color accent = Color(0xFFFF6B00);
   static const Color accentLight = Color(0xFFFF9A4D);
   static const Color accentDark = Color(0xFFCC5500);
 
   // Neutral colors
-  static const Color background = Color(0xFFF5F7FA);
   static const Color surface = Color(0xFFFFFFFF);
   static const Color cardBackground = Color(0xFFFFFFFF);
 
   // Text colors
-  static const Color textPrimary = Color(0xFF212121);
-  static const Color textSecondary = Color(0xFF757575);
   static const Color textHint = Color(0xFFBDBDBD);
   static const Color textDisabled = Color(0xFFE0E0E0);
   static const Color textLight = Color(0xFFFFFFFF);
 
   // Status colors
-  static const Color success = Color(0xFF4CAF50);
-  static const Color warning = Color(0xFFFFC107);
-  static const Color error = Color(0xFFF44336);
-  static const Color info = Color(0xFF2196F3);
 
   // Exam mode colors
   static const Color jeeColor = Color(0xFF0A6EBD);
